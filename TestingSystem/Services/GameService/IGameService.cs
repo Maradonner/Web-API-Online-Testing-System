@@ -6,7 +6,7 @@ namespace TestingSystem.Services.GameService
 {
     public interface IGameService
     {
-        Task<StateData> StartQuiz(int id);
+        Task<StateData> StartQuiz(int id, int userId);
         Task<object> PostAnswerQuiz(AnswerDTO answer);
     }
 }

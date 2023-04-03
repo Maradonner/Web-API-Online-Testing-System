@@ -49,5 +49,47 @@
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="TestingSystem.Controllers.AdminController">
+    <Position X="7.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAABAAEAAABAAAgAAAAIAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Controllers\AdminController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestingSystem.Controllers.AuthController">
+    <Position X="9.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAQAAAAAAAAAAAAAAgAAAAABAAAAAQAAAAAAA=</HashCode>
+      <FileName>Controllers\AuthController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestingSystem.Controllers.GameController">
+    <Position X="6" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAQAAAAAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>Controllers\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestingSystem.Controllers.QuestionController">
+    <Position X="9.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAABAAAAAARAAAAACAAIAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\QuestionController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestingSystem.Controllers.QuizController">
+    <Position X="6" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgABAAAAEABAAIAAEQAIAAEAAAAAAAAgAA=</HashCode>
+      <FileName>Controllers\QuizController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestingSystem.Controllers.UserController">
+    <Position X="7.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAABAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\UserController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

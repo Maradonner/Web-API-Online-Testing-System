@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Security.Claims;
 using TestingSystem.Data;
 using TestingSystem.DTOs;
 using TestingSystem.Models;
@@ -37,8 +38,9 @@ public class GameService : IGameService
         _mapper = mapper;
     }
 
-    public async Task<StateData> StartQuiz(int id)
+    public async Task<StateData> StartQuiz(int id, int userId)
     {
+
         var quiz = await _context.TriviaQuizs
             .Include(x => x.Questions)
             .FirstOrDefaultAsync(x => x.Id == id);
@@ -56,6 +58,7 @@ public class GameService : IGameService
         {
             StartTime = DateTime.Now,
             TriviaQuiz = quiz,
+            UserId = userId,
             Answers = questions.Select(q => new Answer
             {
                 TriviaQuestionId = q.Id,

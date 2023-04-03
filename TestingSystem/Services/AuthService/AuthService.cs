@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using TestingSystem.Data;
@@ -42,14 +39,14 @@ namespace TestingSystem.Services.AuthService
         {
             //var refreshToken = _httpContextAccessor?.HttpContext?.Request.Cookies["refreshToken"];
             var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-            if(user == null)
+            if (user == null)
             {
                 return new AuthResponseDto()
                 {
                     Message = "Invalid Refresh Token"
                 };
             }
-            else if(user.TokenExpired < DateTime.Now)
+            else if (user.TokenExpired < DateTime.Now)
             {
                 return new AuthResponseDto()
                 {
@@ -64,7 +61,7 @@ namespace TestingSystem.Services.AuthService
             return new AuthResponseDto
             {
                 Success = true,
-                Token =  token,
+                Token = token,
                 RefreshToken = newRefreshToken.Token,
                 TokenExpires = newRefreshToken.Expires
             };
@@ -105,7 +102,7 @@ namespace TestingSystem.Services.AuthService
             return new AuthResponseDto
             {
                 Success = true,
-                Token =  token,
+                Token = token,
                 RefreshToken = refreshToken.Token,
                 TokenExpires = refreshToken.Expires
             };
@@ -150,6 +147,7 @@ namespace TestingSystem.Services.AuthService
                 HttpOnly = true,
                 Expires = refreshToken.Expires,
             };
+
             _httpContextAccessor?.HttpContext?.Response
                 .Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
 
@@ -160,9 +158,29 @@ namespace TestingSystem.Services.AuthService
             await _context.SaveChangesAsync();
         }
 
+        public async Task<AuthResponseDto> ChangePassword(string oldPassword, string newPassword, int userId)
+        {
+            var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.Id == userId);
 
+            if (user == null)
+            {
+                return new AuthResponseDto { Message = "User not found." };
+            }
+            if (!VerifyPasswordHash(oldPassword, user.PasswordHash, user.PasswordSalt))
+            {
+                return new AuthResponseDto { Message = "Wrong Password." };
+            }
 
+            CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return new AuthResponseDto { Message = "Succeed" };
+        }
     }
 }
 
