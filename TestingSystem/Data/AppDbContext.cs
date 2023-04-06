@@ -13,6 +13,8 @@ namespace TestingSystem.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Answer> Answers { get; set; }
         public DbSet<ActiveTrivia> ActiveTrivias { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<StudentCourse> StudentCourses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,7 +24,20 @@ namespace TestingSystem.Data
              .HasForeignKey(x => x.RoleId)
              .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<StudentCourse>()
+                .HasKey(sc => new { sc.StudentId, sc.CourseId });
 
+            modelBuilder.Entity<StudentCourse>()
+                .HasOne(sc => sc.Student)
+                .WithMany(s => s.StudentCourses)
+                .HasForeignKey(sc => sc.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StudentCourse>()
+                .HasOne(sc => sc.Course)
+                .WithMany(c => c.StudentCourses)
+                .HasForeignKey(sc => sc.CourseId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

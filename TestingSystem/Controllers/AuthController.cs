@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Keycloak.Net.Models.Clients;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,13 @@ namespace TestingSystem.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly HttpClient _httpClient;
         public AuthController(IAuthService authService)
         {
             _authService = authService;
+            _httpClient = new HttpClient();
         }
+
         [HttpPost("register")]
         public async Task<ActionResult<User>> RegisterUser(UserDto request)
         {
@@ -47,6 +51,8 @@ namespace TestingSystem.Controllers
         {
             return Ok("You are authorized!");
         }
+
+
 
 
 

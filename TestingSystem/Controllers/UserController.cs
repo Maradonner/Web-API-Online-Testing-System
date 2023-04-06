@@ -60,7 +60,7 @@ namespace TestingSystem.Controllers
 
             int userIdInt = int.Parse(userId);
 
-            var attempts = await _context.ActiveTrivias.Where(x => x.UserId == userIdInt).ToListAsync();
+            var attempts = await _context.ActiveTrivias.Where(x => x.UserId == userIdInt).Include(x => x.Answers).Include(x => x.TriviaQuiz).ToListAsync();
             return Ok(attempts);
         }
 

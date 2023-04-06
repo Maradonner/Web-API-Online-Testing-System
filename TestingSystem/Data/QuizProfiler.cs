@@ -19,6 +19,9 @@ namespace TestingSystem.Data
             CreateMap<AnswerDTO, Answer>();
             CreateMap<ActiveTriviaDTO, ActiveTrivia>();
 
+            CreateMap<CourseDto, Course>();
+
+
             //CreateMap<List<OptionDTO>, List<TriviaOption>>();
         }
     }

@@ -18,5 +18,6 @@ namespace TestingSystem.Models
         public Role? Role { get; set; }
         [NotMapped]
         public virtual List<TriviaQuiz>? TriviaQuiz { get; set; }
+        public virtual List<StudentCourse> StudentCourses { get; set; } = new List<StudentCourse>();
     }
 }

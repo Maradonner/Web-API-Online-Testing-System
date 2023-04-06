@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Keycloak.Net.Models.Clients;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Security.Claims;
 using TestingSystem.Data;
+using TestingSystem.Hubs;
 using TestingSystem.Models;
 
 namespace TestingSystem.Controllers
@@ -17,11 +20,14 @@ namespace TestingSystem.Controllers
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly int _pageSize = 10;
+        private readonly IHubContext<QuizHub> _quizHub;
 
-        public QuizController(AppDbContext context, IMapper mapper)
+
+        public QuizController(AppDbContext context, IMapper mapper, IHubContext<QuizHub> quizHub)
         {
             _context = context;
             _mapper = mapper;
+            _quizHub = quizHub;
         }
 
         [HttpGet("TotalPages")]
@@ -113,8 +119,7 @@ namespace TestingSystem.Controllers
             return Ok(questions);
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpPost("create-quiz")]
         public async Task<ActionResult> CreateQuiz([FromBody] QuizDTO model)
         {
             if (!ModelState.IsValid)
@@ -124,12 +129,7 @@ namespace TestingSystem.Controllers
 
             int userId = Convert.ToInt32(HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-            //if(userId == null)
-            //{
-            //    userId = 0;
-            //}
 
-            //int userIdInt = int.Parse(userId);
             var quiz = _mapper.Map<TriviaQuiz>(model);
 
             quiz.UserId = userId;
@@ -137,6 +137,9 @@ namespace TestingSystem.Controllers
 
             await _context.TriviaQuizs.AddAsync(quiz);
             await _context.SaveChangesAsync();
+
+            var userName = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            await _quizHub.Clients.All.SendAsync("QuizCreated", quiz.Id, quiz.Title, userName);
 
             return NoContent();
         }
