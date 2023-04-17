@@ -8,7 +8,6 @@ namespace TestingSystem.Services.CourseService
         Task<Course> GetCourseAsync(int id);
         Task UpdateCourseAsync(int id, Course course);
         Task DeleteCourseAsync(int id);
-        bool CourseExists(int id);
         Task<User> JoinCourseByCodeAsync(int userId, string courseCode);
         Task<bool> AddStudentToCourseByCodeAsync(string courseCode, int studentId);
         Task<bool> AddStudentToCourseAsync(int courseId, int studentId);

@@ -9,7 +9,5 @@ namespace TestingSystem.Services.AuthService
         Task<AuthResponseDto> Login(UserDto request);
         Task<AuthResponseDto> RefreshToken(string refreshToken);
         Task<AuthResponseDto> ChangePassword(string oldPassword, string newPassword, int userId);
-        //Task<bool> RestorePassword(string email);
-
     }
 }

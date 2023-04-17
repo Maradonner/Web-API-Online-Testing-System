@@ -34,11 +34,6 @@ namespace TestingSystem.Services.CourseService
             _context = context;
         }
 
-        public bool CourseExists(int id)
-        {
-            return _context.Courses.Any(e => e.Id == id);
-        }
-
         public async Task<Course> CreateCourseAsync(Course course)
         {
             course.CourseCode = CourseCodeGenerator.GenerateUniqueCode(_context);

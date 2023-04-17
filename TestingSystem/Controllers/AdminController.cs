@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TestingSystem.Data;
@@ -9,6 +10,7 @@ namespace TestingSystem.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "User")]
 public class AdminController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -30,7 +32,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAll()
+    public async Task<ActionResult> GetAllUsers()
     {
         var users = await _context.Users.Include(r => r.Role).Select(x => new
         {
@@ -43,11 +45,9 @@ public class AdminController : ControllerBase
         return Ok(users);
     }
 
-    [HttpPut("UpdateUser")]
-    public async Task<ActionResult> PutQuestion([FromBody] UserDto model)
+    [HttpPut("update-user")]
+    public async Task<ActionResult> UpdateUser(UserDto model)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-
         var user = await _context.Users.FirstOrDefaultAsync(i => i.Id == model.Id);
 
         if (user == null)

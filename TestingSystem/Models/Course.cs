@@ -11,7 +11,7 @@ namespace TestingSystem.Models
         [ForeignKey(nameof(User))]
         public int TeacherId { get; set; }
         public User Teacher { get; set; }
-        public virtual List<TriviaQuiz> TriviaQuizzes { get; set; } = new List<TriviaQuiz>();
-        public virtual List<StudentCourse> StudentCourses { get; set; } = new List<StudentCourse>();
+        public virtual List<TriviaQuiz> TriviaQuizzes { get; set; } = new();
+        public virtual List<StudentCourse> StudentCourses { get; set; } = new();
     }
 }

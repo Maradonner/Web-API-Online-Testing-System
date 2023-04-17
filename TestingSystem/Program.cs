@@ -11,11 +11,16 @@ using TestingSystem.Data;
 using TestingSystem.Filters;
 using TestingSystem.HttpHandler;
 using TestingSystem.Hubs;
+using TestingSystem.Repositories;
+using TestingSystem.Repositories.Interfaces;
 using TestingSystem.Services.AuthService;
 using TestingSystem.Services.CourseService;
 using TestingSystem.Services.GameService;
 
 var builder = WebApplication.CreateBuilder(args);
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 
 // Add services to the container.
 builder.Services.AddMvc(options =>
@@ -56,7 +61,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
-
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddTransient<HttpTrackerHandler>();
@@ -66,7 +71,7 @@ builder.Services.AddHttpClient("auth")
                 .AddHttpMessageHandler<HttpTrackerHandler>();
 
 builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
