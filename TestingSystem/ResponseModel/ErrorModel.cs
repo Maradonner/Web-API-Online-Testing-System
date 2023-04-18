@@ -1,8 +1,7 @@
-﻿namespace TestingSystem.ResponseModel
+﻿namespace TestingSystem.ResponseModel;
+
+public class ErrorModel
 {
-    public class ErrorModel
-    {
-        public string FieldName { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-    }
+    public string FieldName { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
 }

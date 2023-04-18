@@ -5,34 +5,38 @@ using TestingSystem.Models;
 using TestingSystem.Repositories.Interfaces;
 using TestingSystem.Services.AuthService;
 
-namespace TestingSystem.Repositories
+namespace TestingSystem.Repositories;
+
+public class UserRepository : IUserRepository
 {
-    public class UserRepository : IUserRepository
+    private readonly IAuthService _authService;
+    private readonly AppDbContext _context;
+
+    public UserRepository(AppDbContext context, IMapper mapper, IAuthService authService)
     {
-        private readonly AppDbContext _context;
-        private readonly IAuthService _authService;
+        _context = context;
+        _authService = authService;
+    }
 
-        public UserRepository(AppDbContext context, IMapper mapper, IAuthService authService)
-        {
-            _context = context;
-            _authService = authService;
-        }
-
-        public async Task<object> GetUserInfo(int userId)
-        {
-            return await _context.Users.Where(x => x.Id == userId).Select(x => new
+    public async Task<object> GetUserInfo(int userId)
+    {
+        return await _context.Users
+            .Where(x => x.Id == userId)
+            .Select(x => new
             {
                 x.ImageUrl,
                 role = x.Role.Name,
-                x.Username,
+                x.Username
             }).FirstOrDefaultAsync();
-        }
+    }
 
-        public async Task<IEnumerable<ActiveTrivia>> GetUserAttempts(int userId)
-        {
-            return await _context.ActiveTrivias
-                .Where(x => x.UserId == userId)
-                .Include(x => x.Answers).Include(x => x.TriviaQuiz).ToListAsync();
-        }
+    public async Task<IEnumerable<ActiveTrivia>> GetUserAttempts(int userId)
+    {
+        return await _context.ActiveTrivias
+            .Where(x => x.UserId == userId)
+            .Include(x => x.Answers)
+            .Include(x => x.TriviaQuiz)
+            .OrderByDescending(x => x.StartTime)
+            .ToListAsync();
     }
 }

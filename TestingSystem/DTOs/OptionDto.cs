@@ -1,8 +1,7 @@
-﻿namespace TestingSystem.Models
+﻿namespace TestingSystem.Models;
+
+public class OptionDto
 {
-    public class OptionDTO
-    {
-        public string Title { get; set; }
-        public bool IsCorrect { get; set; }
-    }
+    public string Title { get; set; }
+    public bool IsCorrect { get; set; }
 }

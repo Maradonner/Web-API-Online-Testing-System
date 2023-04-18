@@ -1,12 +1,5 @@
 ﻿using IntegrationTests.Helpers;
-using Keycloak.Net.Models.Root;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 using TestingSystem.Models;
 using TestingSystem.Services.CourseService;
 
@@ -22,7 +15,7 @@ public class CourseTest : BaseTest
     [Test]
     public void GeneratorCodeTest()
     {
-        int length = 6;
+        const int length = 6;
         var code = CourseCodeGenerator.GenerateUniqueCode(_dbHelper.Context, length);
         Assert.That(code.Length, Is.EqualTo(length));
     }
@@ -30,10 +23,13 @@ public class CourseTest : BaseTest
     [Test]
     public async Task CreateTest()
     {
-        using (TransactionScope scope = Helper.CreateTransactionScope())
+        using (var scope = Helper.CreateTransactionScope())
         {
             var course = new Course();
-            Assert.Throws<DbUpdateException>(delegate { _courseService.CreateCourseAsync(course).GetAwaiter().GetResult(); });
+            Assert.Throws<DbUpdateException>(delegate
+            {
+                _courseService.CreateCourseAsync(course).GetAwaiter().GetResult();
+            });
 
             course.TeacherId = 4;
             course.Name = "test";
@@ -52,18 +48,17 @@ public class CourseTest : BaseTest
     [Test]
     public async Task DeleteTest()
     {
-        using (TransactionScope scope = Helper.CreateTransactionScope())
+        using (var scope = Helper.CreateTransactionScope())
         {
             var course = new Course
             {
                 TeacherId = 4,
                 Name = "test",
-                Description = "test",
+                Description = "test"
             };
 
             var createdCourse = await _courseService.CreateCourseAsync(course);
             await _courseService.DeleteCourseAsync(createdCourse.Id);
         }
     }
-
 }

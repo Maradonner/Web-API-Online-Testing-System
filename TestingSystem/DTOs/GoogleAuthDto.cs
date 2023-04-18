@@ -1,7 +1,6 @@
-﻿namespace TestingSystem.DTOs
+﻿namespace TestingSystem.DTOs;
+
+public class GoogleAuthDto
 {
-    public class GoogleAuthDto
-    {
-        public string IdToken { get; set; }
-    }
+    public string IdToken { get; set; }
 }

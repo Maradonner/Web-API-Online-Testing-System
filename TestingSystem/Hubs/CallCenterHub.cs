@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace TestingSystem.Hubs
+namespace TestingSystem.Hubs;
+
+public class CallCenterHub : Hub
 {
-    public class CallCenterHub : Hub
-    {
-    }
 }

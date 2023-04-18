@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
+﻿using System.Transactions;
 
-namespace IntegrationTests.Helpers
+namespace IntegrationTests.Helpers;
+
+public static class Helper
 {
-    public static class Helper
+    public static TransactionScope CreateTransactionScope(int seconds = 1)
     {
-        public static TransactionScope CreateTransactionScope(int seconds = 1)
-        {
-            return new TransactionScope(
-                TransactionScopeOption.Required,
-                new TimeSpan(0, 0, seconds),
-                TransactionScopeAsyncFlowOption.Enabled);
-        }
+        return new TransactionScope(
+            TransactionScopeOption.Required,
+            new TimeSpan(0, 0, seconds),
+            TransactionScopeAsyncFlowOption.Enabled);
     }
 }

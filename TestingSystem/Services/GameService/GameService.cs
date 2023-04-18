@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Security.Claims;
 using TestingSystem.Data;
 using TestingSystem.DTOs;
 using TestingSystem.Models;
@@ -40,15 +37,11 @@ public class GameService : IGameService
 
     public async Task<StateData> StartQuiz(int id, int userId)
     {
-
-        var quiz = await _context.TriviaQuizs
+        var quiz = await _context.TriviaQuizzes
             .Include(x => x.Questions)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        if (quiz == null)
-        {
-            return null;
-        }
+        if (quiz == null) return null;
 
         var rnd = new Random();
         var questions = quiz.Questions.Shuffle(rnd).ToList();
@@ -64,7 +57,6 @@ public class GameService : IGameService
                 TriviaQuestionId = q.Id,
                 ActiveTriviaId = id
             }).ToList()
-
         };
 
         await _context.ActiveTrivias.AddAsync(activeTrivia);
@@ -76,44 +68,31 @@ public class GameService : IGameService
         return await CreateStateData(activeTrivia, questionDetails, 0);
     }
 
-    public async Task<object> PostAnswerQuiz(AnswerDTO answer)
+    public async Task<object> PostAnswerQuiz(AnswerDto answer)
     {
         bool isCorrectFlag = false, isFinished = false, isTimedOut = false;
 
-        if (answer.ActiveTriviaId == 0 || answer.TriviaQuestionId == 0)
-        {
-            return new { Message = "Invalid request data" };
-        }
+        if (answer.ActiveTriviaId == 0 || answer.TriviaQuestionId == 0) return new { Message = "Invalid request data" };
 
         var activeTrivia = await GetActiveSessionById(answer.ActiveTriviaId);
 
         var currentAnswer = activeTrivia.Answers.FirstOrDefault(x => x.TriviaQuestionId == answer.TriviaQuestionId);
-        if (currentAnswer == null)
-        {
-            return new { message = "No Answer" };
-        }
+        if (currentAnswer == null) return new { message = "No Answer" };
 
         var nextAnswer = activeTrivia.Answers.FirstOrDefault(x => x.Id > currentAnswer.Id);
-        if (nextAnswer == null)
-        {
-            isFinished = true;
-            //return new { Message = "Session has ended" };
-        }
-
+        if (nextAnswer == null) isFinished = true;
+        //return new { Message = "Session has ended" };
 
         var options = await _context.TriviaOptions
             .Where(x => x.TriviaQuestionId == answer.TriviaQuestionId)
             .ToListAsync();
 
         var opt = options.FirstOrDefault(x => x.Id == answer.TriviaOptionId);
-        var correctOption = options.FirstOrDefault(x => x.IsCorrect == true);
+        var correctOption = options.FirstOrDefault(x => x.IsCorrect);
 
         await UpdateAnswerResult(currentAnswer, opt, correctOption);
 
-        if (opt != null && opt.IsCorrect)
-        {
-            isCorrectFlag = true;
-        }
+        if (opt != null && opt.IsCorrect) isCorrectFlag = true;
 
 
         var question = nextAnswer != null ? await GetQuestionDetails(nextAnswer.TriviaQuestionId) : null;
@@ -122,7 +101,8 @@ public class GameService : IGameService
 
 
         var stateData = await CreateStateData(activeTrivia, question, mistakes);
-        var dataToFront = await CreateAnswerResult(isCorrectFlag, isTimedOut, stateData, correctOption.Title, liveCount, mistakes, isFinished);
+        var dataToFront = await CreateAnswerResult(isCorrectFlag, isTimedOut, stateData, correctOption.Title, liveCount,
+            mistakes, isFinished);
 
         return dataToFront;
     }
@@ -135,10 +115,7 @@ public class GameService : IGameService
             .FirstOrDefaultAsync(x => x.Id == id);
 
 
-        if (activeSession == null)
-        {
-            throw new ArgumentException($"Active session with id {id} was not found.");
-        }
+        if (activeSession == null) throw new ArgumentException($"Active session with id {id} was not found.");
 
         return activeSession;
     }
@@ -183,7 +160,7 @@ public class GameService : IGameService
 
     private async Task UpdateAnswerResult(Answer ans, TriviaOption myOption, TriviaOption correctOption)
     {
-        if (ans == null) 
+        if (ans == null)
             throw new ArgumentException("Not valid");
 
         if (myOption == null)
@@ -207,10 +184,7 @@ public class GameService : IGameService
     private async Task<AnswerResponse> CreateAnswerResult(bool isCorrect, bool isTimedOut, StateData question,
         string correctOption, int livesCount, int mistakes, bool isFinished)
     {
-        if(mistakes > livesCount)
-        {
-            isFinished = true;
-        }
+        if (mistakes > livesCount) isFinished = true;
         var response = new AnswerResponse
         {
             IsCorrect = isCorrect,
@@ -219,7 +193,7 @@ public class GameService : IGameService
             CorrectAnswer = correctOption,
             Question = question,
             LivesCount = livesCount,
-            LivesLeft = livesCount - mistakes,
+            LivesLeft = livesCount - mistakes
         };
         return response;
     }

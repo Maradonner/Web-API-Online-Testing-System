@@ -1,28 +1,19 @@
 ﻿using AutoMapper;
-using System;
 using TestingSystem.DTOs;
 using TestingSystem.Models;
 
-namespace TestingSystem.Data
+namespace TestingSystem.Data;
+
+public class QuizProfiler : Profile
 {
-    public class QuizProfiler : Profile
+    public QuizProfiler()
     {
-        public QuizProfiler()
-        {
-            CreateMap<TriviaQuestionDTO, TriviaQuestion>();
-            CreateMap<TriviaOptionDTO, TriviaOption>();
+        CreateMap<OptionDto, TriviaOption>();
+        CreateMap<QuestionDto, TriviaQuestion>();
+        CreateMap<QuizDto, TriviaQuiz>();
 
-            CreateMap<OptionDTO, TriviaOption>();
-            CreateMap<QuestionDTO, TriviaQuestion>();
-            CreateMap<QuizDTO, TriviaQuiz>();
+        CreateMap<AnswerDto, Answer>();
 
-            CreateMap<AnswerDTO, Answer>();
-            CreateMap<ActiveTriviaDTO, ActiveTrivia>();
-
-            CreateMap<CourseDto, Course>();
-
-
-            //CreateMap<List<OptionDTO>, List<TriviaOption>>();
-        }
+        CreateMap<CourseDto, Course>();
     }
 }

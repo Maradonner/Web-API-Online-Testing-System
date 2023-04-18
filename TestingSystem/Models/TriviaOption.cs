@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace TestingSystem.Models;
 
-namespace TestingSystem.Models
+public class TriviaOption
 {
-    public class TriviaOption
-    {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public bool IsCorrect { get; set; }
-        public virtual TriviaQuestion TriviaQuestion { get; set; }
-        public int TriviaQuestionId { get; set; }
-    }
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public bool IsCorrect { get; set; }
+    public virtual TriviaQuestion TriviaQuestion { get; set; }
+    public int TriviaQuestionId { get; set; }
 }

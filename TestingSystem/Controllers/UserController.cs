@@ -1,51 +1,49 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using TestingSystem.Repositories.Interfaces;
 using TestingSystem.Services.AuthService;
 
-namespace TestingSystem.Controllers
+namespace TestingSystem.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class UserController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class UserController : ControllerBase
+    private readonly IAuthService _authService;
+    private readonly IUserRepository _userRepository;
+
+    public UserController(IUserRepository userRepository, IAuthService authService)
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IAuthService _authService;
+        _userRepository = userRepository;
+        _authService = authService;
+    }
 
-        public UserController(IUserRepository userRepository, IAuthService authService)
-        {
-            _userRepository = userRepository;
-            _authService = authService;
-        }
+    [HttpGet("GetInfo")]
+    public async Task<ActionResult> GetInfo()
+    {
+        var info = await _userRepository.GetUserInfo(GetUserId());
+        return Ok(info);
+    }
 
-        [HttpGet("GetInfo")]
-        public async Task<ActionResult> GetInfo()
-        {
-            var info = await _userRepository.GetUserInfo(GetUserId());
-            return Ok(info);
-        }
+    [HttpGet("GetAllAttempts")]
+    public async Task<ActionResult> GetAllAttempts()
+    {
+        var attempts = await _userRepository.GetUserAttempts(GetUserId());
+        return Ok(attempts);
+    }
 
-        [HttpGet("GetAllAttempts")]
-        public async Task<ActionResult> GetAllAttempts()
-        {
-            var attempts = await _userRepository.GetUserAttempts(GetUserId());
-            return Ok(attempts);
-        }
+    [HttpPut("Edit")]
+    public async Task<ActionResult> EditAccount(string oldPassword, string newPassword)
+    {
+        await _authService.ChangePassword(oldPassword, newPassword, GetUserId());
+        return Ok();
+    }
 
-        [HttpPut("Edit")]
-        public async Task<ActionResult> EditAccount(string oldPassword, string newPassword)
-        {
-            await _authService.ChangePassword(oldPassword, newPassword, GetUserId());
-            return Ok();
-        }
-
-        private int GetUserId()
-        {
-            int.TryParse(HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId);
-            return userId;
-        }
-
+    private int GetUserId()
+    {
+        int.TryParse(HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId);
+        return userId;
     }
 }

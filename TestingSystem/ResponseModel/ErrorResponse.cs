@@ -1,7 +1,6 @@
-﻿namespace TestingSystem.ResponseModel
+﻿namespace TestingSystem.ResponseModel;
+
+public class ErrorResponse
 {
-    public class ErrorResponse
-    {
-        public List<ErrorModel> Errors { get; set; } = new();
-    }
+    public List<ErrorModel> Errors { get; set; } = new();
 }

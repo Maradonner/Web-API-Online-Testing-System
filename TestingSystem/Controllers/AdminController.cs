@@ -40,7 +40,7 @@ public class AdminController : ControllerBase
             x.ImageUrl,
             x.Role!.Name,
             x.Username,
-            Quizzes = x.TriviaQuiz,
+            Quizzes = x.TriviaQuiz
         }).ToListAsync();
         return Ok(users);
     }
@@ -50,10 +50,7 @@ public class AdminController : ControllerBase
     {
         var user = await _context.Users.FirstOrDefaultAsync(i => i.Id == model.Id);
 
-        if (user == null)
-        {
-            return BadRequest();
-        }
+        if (user == null) return BadRequest();
 
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
@@ -66,10 +63,7 @@ public class AdminController : ControllerBase
     {
         var user = await _context.Users.FirstOrDefaultAsync(q => q.Id == id);
 
-        if (user == null)
-        {
-            return NotFound();
-        }
+        if (user == null) return NotFound();
 
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();

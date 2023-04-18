@@ -1,7 +1,6 @@
-﻿namespace TestingSystem.Models
+﻿namespace TestingSystem.Models;
+
+public class RefreshDto
 {
-    public class RefreshDTO
-    {
-        public string RefreshToken { get; set; }
-    }
+    public string RefreshToken { get; set; }
 }

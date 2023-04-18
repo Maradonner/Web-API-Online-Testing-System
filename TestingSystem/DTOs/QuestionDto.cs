@@ -1,10 +1,9 @@
-﻿namespace TestingSystem.Models
+﻿namespace TestingSystem.Models;
+
+public class QuestionDto
 {
-    public class QuestionDTO
-    {
-        public int? Id { get; set; }
-        public string Title { get; set; }
-        public string PictureUrl { get; set; }
-        public List<OptionDTO> Options { get; set; }
-    }
+    public int? Id { get; set; }
+    public string Title { get; set; }
+    public string PictureUrl { get; set; }
+    public List<OptionDto> Options { get; set; }
 }
