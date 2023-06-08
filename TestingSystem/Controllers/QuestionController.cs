@@ -20,10 +20,12 @@ public class QuestionController : ControllerBase
     }
 
     [HttpGet]
-    [Route("GetQuestion/{id}")]
+    [Route("GetQuestion/{id}", Name = "Question")]
     public async Task<ActionResult> GetQuestionById(int id)
     {
-        var question = await _context.TriviaQuestions.Include(o => o.Options).FirstOrDefaultAsync(x => x.Id == id);
+        var question = await _context.TriviaQuestions
+            .Include(o => o.Options)
+            .FirstOrDefaultAsync(x => x.Id == id);
         if (question == null) return NotFound();
         return Ok(question);
     }
@@ -42,21 +44,23 @@ public class QuestionController : ControllerBase
     [Route("CreateQuestion")]
     public ActionResult CreateQuiz([FromBody] QuestionDto model)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
         var quiz = _mapper.Map<TriviaQuestion>(model);
 
         _context.TriviaQuestions.Add(quiz);
         _context.SaveChanges();
 
-        return NoContent();
+        return CreatedAtRoute("Question", new {id = quiz.Id});
     }
 
     [HttpPut]
     [Route("UpdateQuestion")]
     public async Task<ActionResult> PutQuestion([FromBody] QuestionDto model)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
         var question = await _context.TriviaQuestions.Include(o => o.Options)
             .FirstOrDefaultAsync(i => i.Id == model.Id);
         if (question == null) return BadRequest();
@@ -67,6 +71,7 @@ public class QuestionController : ControllerBase
 
         _context.TriviaQuestions.Update(question);
         await _context.SaveChangesAsync();
+
 
         return Ok(question);
     }

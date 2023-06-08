@@ -26,7 +26,7 @@ public class AuthService : IAuthService
         _httpClient = new HttpClient();
     }
 
-    public async Task<User> RegisterUser(UserDto request)
+    public async Task<User> RegisterUserAsync(UserDto request)
     {
         CreatePasswordHash(request.Password, out var passwordHash, out var passwordSalt);
         var user = new User
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
         return user;
     }
 
-    public async Task<AuthResponseDto> RefreshToken(string refreshToken)
+    public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken)
     {
         //var refreshToken = _httpContextAccessor?.HttpContext?.Request.Cookies["refreshToken"];
         var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
@@ -57,7 +57,7 @@ public class AuthService : IAuthService
 
         var token = CreateToken(user);
         var newRefreshToken = CreateRefreshToken();
-        await SetRefreshToken(newRefreshToken, user);
+        await SetRefreshTokenAsync(newRefreshToken, user);
 
         return new AuthResponseDto
         {
@@ -68,7 +68,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponseDto> Login(UserDto request)
+    public async Task<AuthResponseDto> LoginAsync(UserDto request)
     {
         var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.Username == request.Username);
 
@@ -77,7 +77,7 @@ public class AuthService : IAuthService
             return new AuthResponseDto { Message = "Wrong Password." };
         var token = CreateToken(user);
         var refreshToken = CreateRefreshToken();
-        await SetRefreshToken(refreshToken, user);
+        await SetRefreshTokenAsync(refreshToken, user);
         return new AuthResponseDto
         {
             Success = true,
@@ -87,7 +87,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponseDto> ChangePassword(string oldPassword, string newPassword, int userId)
+    public async Task<AuthResponseDto> ChangePasswordAsync(string oldPassword, string newPassword, int userId)
     {
         var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -157,7 +157,7 @@ public class AuthService : IAuthService
         return refreshToken;
     }
 
-    private async Task SetRefreshToken(RefreshToken refreshToken, User user)
+    private async Task SetRefreshTokenAsync(RefreshToken refreshToken, User user)
     {
         var cookieOptions = new CookieOptions
         {
@@ -173,5 +173,10 @@ public class AuthService : IAuthService
         user.TokenExpired = refreshToken.Expires;
 
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<User> GetUserAsync(string email)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x => x.Username == email);
     }
 }

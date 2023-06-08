@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TestingSystem.Data;
+using TestingSystem.DTOs;
 using TestingSystem.Models;
 
 namespace TestingSystem.Services.QuizService;
@@ -25,7 +26,7 @@ public class QuizService : IQuizService
     {
         return await _context.TriviaQuizzes
             .Include(o => o.Questions)
-            .ThenInclude(o => o.Options)
+                .ThenInclude(o => o.Options)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
@@ -39,10 +40,12 @@ public class QuizService : IQuizService
 
     public async Task<List<TriviaQuiz>> GetAllQuizAsync()
     {
-        return await _context.TriviaQuizzes
+        var model = await _context.TriviaQuizzes
             .Include(o => o.Questions)
-            .ThenInclude(o => o.Options)
+                .ThenInclude(o => o.Options)
             .ToListAsync();
+
+        return model;
     }
 
     public async Task<(bool isCompleted, int score)> CheckUserCompletionStatusAsync(int userId, int triviaQuizId)
@@ -60,7 +63,7 @@ public class QuizService : IQuizService
         return (false, 0);
     }
 
-    public async Task<TriviaQuiz> CreateQuizAsync(QuizDto model, int userId)
+    public async Task<TriviaQuiz> CreateQuizAsync(QuizForCreationDto model, int userId)
     {
         var quiz = _mapper.Map<TriviaQuiz>(model);
         quiz.UserId = userId;
@@ -71,11 +74,11 @@ public class QuizService : IQuizService
         return quiz;
     }
 
-    public async Task UpdateQuizAsync(QuizDto model)
+    public async Task UpdateQuizAsync(QuizForUpdateDto model)
     {
         var quiz = await _context.TriviaQuizzes
             .Include(q => q.Questions)
-            .ThenInclude(o => o.Options)
+                .ThenInclude(o => o.Options)
             .FirstOrDefaultAsync(i => i.Id == model.Id);
 
         if (quiz != null)
@@ -94,6 +97,20 @@ public class QuizService : IQuizService
 
     public async Task<List<TriviaQuiz>> GetMyQuizzesAsync(int userId)
     {
-        return await _context.TriviaQuizzes.Where(x => x.UserId == userId).ToListAsync();
+        return await _context.TriviaQuizzes
+            .Where(x => x.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<bool> DeleteQuizAsync(TriviaQuiz quiz)
+    {
+        _context.TriviaQuizzes.Remove(quiz);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public Task<bool> DeleteQuizAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 }

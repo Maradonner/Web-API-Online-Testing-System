@@ -15,5 +15,9 @@ public class QuizProfiler : Profile
         CreateMap<AnswerDto, Answer>();
 
         CreateMap<CourseDto, Course>();
+
+        CreateMap<TriviaQuiz, QuizForDisplayDto>().ReverseMap();
+        CreateMap<TriviaQuiz, QuizForUpdateDto>().ReverseMap();
+        CreateMap<TriviaQuiz, QuizForCreationDto>().ReverseMap();
     }
 }

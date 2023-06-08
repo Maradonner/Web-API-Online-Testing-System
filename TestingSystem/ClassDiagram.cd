@@ -43,23 +43,26 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TestingSystem.Models.User">
-    <Position X="7.5" Y="1.5" Width="1.5" />
+    <Position X="9.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>EACCQAIAQAAAAAAAGQAAAEAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <HashCode>EACCQAIAQAAAAAAAGQAAAEAAAAAAAAAAAAAAAAAgABA=</HashCode>
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Role" />
+    </ShowAsAssociation>
   </Class>
   <Class Name="TestingSystem.Controllers.AdminController">
     <Position X="7.75" Y="7" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>EAAAAAAAAAAABAAEAAABAAAgAAAAIAAAAgAAAAAAAAA=</HashCode>
+      <HashCode>EAAAAAAAAAAABAAEAAABAAAgAQAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>Controllers\AdminController.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TestingSystem.Controllers.AuthController">
     <Position X="9.5" Y="10.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>EAAAAAAAQAAAAAAAAAAAAAAgAAAAABAAAAAQAAAAAAA=</HashCode>
+      <HashCode>EAAAAAAAQAAAAAAAABAAAAAgAAAAABAAAAAQAAAAAAA=</HashCode>
       <FileName>Controllers\AuthController.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -80,14 +83,14 @@
   <Class Name="TestingSystem.Controllers.QuizController">
     <Position X="6" Y="7" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAgABAAAAEABAAIAAEQAIAAEAAAAAAAAgAA=</HashCode>
+      <HashCode>BAAABAAAAAAAAAAAAEABAAIAAESAIAAEAAAQAAAAgAA=</HashCode>
       <FileName>Controllers\QuizController.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TestingSystem.Controllers.UserController">
     <Position X="7.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAAAABAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAgAAAAAAAAAQAAAACgAACAAEAAAAAAAAAAAAA=</HashCode>
       <FileName>Controllers\UserController.cs</FileName>
     </TypeIdentifier>
   </Class>

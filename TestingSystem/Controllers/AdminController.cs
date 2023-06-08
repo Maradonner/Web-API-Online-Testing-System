@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using TestingSystem.Data;
 using TestingSystem.Models;
 using TestingSystem.Services.AuthService;
@@ -27,7 +28,7 @@ public class AdminController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<User>> RegisterUser(UserDto request)
     {
-        var response = await _authService.RegisterUser(request);
+        var response = await _authService.RegisterUserAsync(request);
         return Ok(response);
     }
 
@@ -44,6 +45,36 @@ public class AdminController : ControllerBase
         }).ToListAsync();
         return Ok(users);
     }
+
+    //[HttpGet]
+    //public async Task<ActionResult> GetUsersSortAsync(string sort, string order, int page)
+    //{
+    //    const int pageSize = 10; // Set the number of items per page
+
+    //    // Apply sorting
+    //    IQueryable<User> query = db.UserInfos;
+    //    switch (sort)
+    //    {
+    //        case "name":
+    //            query = order == "asc" ? query.OrderBy(u => u.Name) : query.OrderByDescending(u => u.Name);
+    //            break;
+    //        case "email":
+    //            query = order == "asc" ? query.OrderBy(u => u.Email) : query.OrderByDescending(u => u.Email);
+    //            break;
+    //        // Add other cases for other sortable properties
+    //        default:
+    //            query = query.OrderBy(u => u.Id);
+    //            break;
+    //    }
+
+    //    // Apply pagination
+    //    query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+    //    var users = query.ToList();
+
+    //    return Ok(users);
+    //}
+
 
     [HttpPut("update-user")]
     public async Task<ActionResult> UpdateUser(UserDto model)

@@ -13,11 +13,13 @@ public class User
     public DateTime TokenCreated { get; set; }
     public DateTime TokenExpired { get; set; }
 
-    [ForeignKey("Role")] public int? RoleId { get; set; } = 1;
+    [ForeignKey("Role")] 
+    public int? RoleId { get; set; } = 1;
 
     public Role? Role { get; set; }
 
-    [NotMapped] public virtual List<TriviaQuiz>? TriviaQuiz { get; set; }
+    [NotMapped] 
+    public virtual List<TriviaQuiz>? TriviaQuiz { get; set; }
 
     public virtual List<StudentCourse> StudentCourses { get; set; } = new();
 }

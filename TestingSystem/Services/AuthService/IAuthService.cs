@@ -5,8 +5,9 @@ namespace TestingSystem.Services.AuthService;
 
 public interface IAuthService
 {
-    Task<User> RegisterUser(UserDto request);
-    Task<AuthResponseDto> Login(UserDto request);
-    Task<AuthResponseDto> RefreshToken(string refreshToken);
-    Task<AuthResponseDto> ChangePassword(string oldPassword, string newPassword, int userId);
+    Task<User> RegisterUserAsync(UserDto request);
+    Task<AuthResponseDto> LoginAsync(UserDto request);
+    Task<AuthResponseDto> RefreshTokenAsync(string refreshToken);
+    Task<AuthResponseDto> ChangePasswordAsync(string oldPassword, string newPassword, int userId);
+    Task<User> GetUserAsync(string email);
 }

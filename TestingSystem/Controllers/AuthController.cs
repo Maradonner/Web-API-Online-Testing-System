@@ -21,14 +21,18 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<User>> RegisterUser(UserDto request)
     {
-        var response = await _authService.RegisterUser(request);
+        if (await _authService.GetUserAsync(request.Username) != null)
+        {
+            return BadRequest("Email is already exists");
+        }
+        var response = await _authService.RegisterUserAsync(request);
         return Ok(response);
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<User>> Login(UserDto request)
     {
-        var response = await _authService.Login(request);
+        var response = await _authService.LoginAsync(request);
         if (response.Success)
             return Ok(response);
 
@@ -38,7 +42,7 @@ public class AuthController : ControllerBase
     [HttpPost("refresh-token")]
     public async Task<ActionResult<string>> RefreshToken(RefreshDto request)
     {
-        var response = await _authService.RefreshToken(request.RefreshToken);
+        var response = await _authService.RefreshTokenAsync(request.RefreshToken);
         if (response.Success)
             return Ok(response);
 

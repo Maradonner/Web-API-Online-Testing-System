@@ -37,7 +37,7 @@ public class UserController : ControllerBase
     [HttpPut("Edit")]
     public async Task<ActionResult> EditAccount(string oldPassword, string newPassword)
     {
-        await _authService.ChangePassword(oldPassword, newPassword, GetUserId());
+        await _authService.ChangePasswordAsync(oldPassword, newPassword, GetUserId());
         return Ok();
     }
 

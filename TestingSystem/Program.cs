@@ -21,11 +21,14 @@ using TestingSystem.Services.QuizService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 
 builder.Services.AddMvc(options => { options.Filters.Add<ValidationFilter>(); });
 builder.Services.AddControllers();
+
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
@@ -119,4 +122,4 @@ app.UseEndpoints(endpoints =>
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
