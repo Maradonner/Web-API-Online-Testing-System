@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TestingSystem.Repositories.Interfaces;
 using TestingSystem.Services.AuthService;
+using TestingSystem.Services.QuizService;
 
 namespace TestingSystem.Controllers;
 
@@ -13,15 +14,24 @@ public class UserController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly IUserRepository _userRepository;
-
-    public UserController(IUserRepository userRepository, IAuthService authService)
+    private readonly IQuizService _quizService;
+    public UserController(IUserRepository userRepository, IAuthService authService, IQuizService quizService)
     {
         _userRepository = userRepository;
         _authService = authService;
+        _quizService = quizService;
     }
 
-    [HttpGet("GetInfo")]
-    public async Task<ActionResult> GetInfo()
+    [HttpGet("profile/{id}")]
+    [AllowAnonymous]
+    public async Task<ActionResult> GetInfo(int id)
+    {
+        var info = await _userRepository.GetUserInfo(id);
+        return Ok(info);
+    }
+
+    [HttpGet("profile")]
+    public async Task<ActionResult> GetMyInformation()
     {
         var info = await _userRepository.GetUserInfo(GetUserId());
         return Ok(info);
@@ -31,13 +41,30 @@ public class UserController : ControllerBase
     public async Task<ActionResult> GetAllAttempts()
     {
         var attempts = await _userRepository.GetUserAttempts(GetUserId());
-        return Ok(attempts);
+        var quizList = new List<object>();
+
+        foreach (var activeTrivia in attempts)
+        {
+            (var isCompleted, var score) = await _quizService.CheckUserCompletionStatusAsync(GetUserId(), activeTrivia.TriviaQuizId);
+
+            quizList.Add(new
+            {
+                activeTrivia.Id,
+                activeTrivia.TriviaQuizId,
+                activeTrivia.Answers.Count,
+                activeTrivia.StartTime,
+                IsCompleted = isCompleted,
+                Score = score
+            });
+        }
+
+        return Ok(quizList);
     }
 
     [HttpPut("Edit")]
-    public async Task<ActionResult> EditAccount(string oldPassword, string newPassword)
+    public async Task<ActionResult> EditAccount(string oldPassword, string newPassword, CancellationToken ct)
     {
-        await _authService.ChangePasswordAsync(oldPassword, newPassword, GetUserId());
+        await _authService.ChangePasswordAsync(oldPassword, newPassword, GetUserId(), ct);
         return Ok();
     }
 

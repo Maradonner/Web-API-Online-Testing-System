@@ -22,7 +22,6 @@ public class CourseController : ControllerBase
         _courseService = courseService;
     }
 
-    // POST: api/courses
     [HttpPost]
     public async Task<ActionResult<Course>> CreateCourse(CourseDto courseDto)
     {
@@ -33,18 +32,17 @@ public class CourseController : ControllerBase
         return CreatedAtAction("GetCourse", new { id = createdCourse.Id }, createdCourse);
     }
 
-    // GET: api/courses/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<Course>> GetCourse(int id)
     {
         var course = await _courseService.GetCourseAsync(id);
 
-        if (course == null) return NotFound();
+        if (course == null) 
+            return NotFound();
 
         return course;
     }
 
-    // PUT: api/courses/{id}
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateCourse(int id, CourseDto courseDto)
     {
@@ -60,7 +58,8 @@ public class CourseController : ControllerBase
     {
         var user = await _courseService.JoinCourseByCodeAsync(userId, courseCode);
 
-        if (user == null) return NotFound("Course not found or user not found");
+        if (user == null) 
+            return NotFound("Course not found or user not found");
 
         return Ok("Successfully joined the course");
     }
@@ -70,7 +69,8 @@ public class CourseController : ControllerBase
     {
         var result = await _courseService.AddStudentToCourseAsync(courseId, studentId);
 
-        if (!result) return BadRequest("Failed to add the student to the course.");
+        if (!result) 
+            return BadRequest("Failed to add the student to the course.");
 
         return Ok();
     }
@@ -81,7 +81,8 @@ public class CourseController : ControllerBase
     {
         var result = await _courseService.AddStudentToCourseByCodeAsync(courseCode, studentId);
 
-        if (!result) return BadRequest("Failed to add the student to the course.");
+        if (!result) 
+            return BadRequest("Failed to add the student to the course.");
 
         return Ok();
     }
@@ -91,7 +92,8 @@ public class CourseController : ControllerBase
     {
         var result = await _courseService.RemoveStudentFromCourseAsync(courseId, studentId);
 
-        if (!result) return BadRequest("Failed to remove the student from the course.");
+        if (!result) 
+            return BadRequest("Failed to remove the student from the course.");
 
         return Ok();
     }

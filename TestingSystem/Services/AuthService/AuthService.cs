@@ -1,11 +1,14 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Tokens;
 using TestingSystem.Data;
 using TestingSystem.DTOs;
+using TestingSystem.Exceptions;
 using TestingSystem.Models;
 
 namespace TestingSystem.Services.AuthService;
@@ -14,7 +17,6 @@ public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
     private readonly AppDbContext _context;
-    private readonly HttpClient _httpClient;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
 
@@ -23,11 +25,13 @@ public class AuthService : IAuthService
         _context = context;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
-        _httpClient = new HttpClient();
     }
 
-    public async Task<User> RegisterUserAsync(UserDto request)
+    public async Task<User> RegisterUserAsync(UserDto request, CancellationToken ct)
     {
+        if (await GetUserAsync(request.Username, ct) != null)
+            throw new UsernameAlreadyExistsException();
+
         CreatePasswordHash(request.Password, out var passwordHash, out var passwordSalt);
         var user = new User
         {
@@ -36,14 +40,16 @@ public class AuthService : IAuthService
             PasswordSalt = passwordSalt
         };
         _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(ct);
         return user;
     }
 
-    public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken)
+    public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken, CancellationToken ct)
     {
-        //var refreshToken = _httpContextAccessor?.HttpContext?.Request.Cookies["refreshToken"];
-        var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        var user = await _context.Users
+            .Include(r => r.Role)
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken, ct);
+        
         if (user == null)
             return new AuthResponseDto
             {
@@ -68,9 +74,11 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponseDto> LoginAsync(UserDto request)
+    public async Task<AuthResponseDto> LoginAsync(UserDto request, CancellationToken ct)
     {
-        var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.Username == request.Username);
+        var user = await _context.Users
+            .Include(r => r.Role)
+            .FirstOrDefaultAsync(u => u.Username == request.Username, ct);
 
         if (user == null) return new AuthResponseDto { Message = "User not found." };
         if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
@@ -87,9 +95,11 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponseDto> ChangePasswordAsync(string oldPassword, string newPassword, int userId)
+    public async Task<AuthResponseDto> ChangePasswordAsync(string oldPassword, string newPassword, int userId, CancellationToken ct)
     {
-        var user = await _context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.Id == userId);
+        var user = await _context.Users
+            .Include(r => r.Role)
+            .FirstOrDefaultAsync(u => u.Id == userId, ct);
 
         if (user == null) return new AuthResponseDto { Message = "User not found." };
         if (!VerifyPasswordHash(oldPassword, user.PasswordHash, user.PasswordSalt))
@@ -101,27 +111,35 @@ public class AuthService : IAuthService
         user.PasswordSalt = passwordSalt;
 
         _context.Users.Update(user);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(ct);
 
         return new AuthResponseDto { Message = "Succeed" };
     }
 
+    public async Task<User?> GetUserAsync(string email, CancellationToken ct)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(x => x.Username == email, ct);
+    }
+
+    public IDbTransaction BeginTransaction()
+    {
+        var transaction = _context.Database.BeginTransaction();
+        return transaction.GetDbTransaction();
+    }
+
     private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
     {
-        using (var hmac = new HMACSHA512(passwordSalt))
-        {
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return computedHash.SequenceEqual(passwordHash);
-        }
+        using var hmac = new HMACSHA512(passwordSalt);
+        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        return computedHash.SequenceEqual(passwordHash);
     }
 
     private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
-        using (var hmac = new HMACSHA512())
-        {
-            passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        }
+        using var hmac = new HMACSHA512();
+        passwordSalt = hmac.Key;
+        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
     }
 
     private string CreateToken(User user)
@@ -175,8 +193,5 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<User> GetUserAsync(string email)
-    {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username == email);
-    }
+
 }

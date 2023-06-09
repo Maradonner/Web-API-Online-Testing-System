@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using TestingSystem.DTOs;
 using TestingSystem.Models;
 
 namespace TestingSystem.Validators;
@@ -21,15 +22,3 @@ public class TriviaQuestionValidator : AbstractValidator<TriviaQuestion>
     }
 }
 
-public class TriviaQuestionDTOValidator : AbstractValidator<QuestionDto>
-{
-    public TriviaQuestionDTOValidator()
-    {
-        RuleFor(x => x.Title)
-            .NotEmpty().WithMessage("Question title is required.")
-            .MaximumLength(500).WithMessage("Question title cannot exceed 500 characters.");
-
-        RuleForEach(x => x.Options)
-            .SetValidator(new TriviaOptionDTOValidator());
-    }
-}

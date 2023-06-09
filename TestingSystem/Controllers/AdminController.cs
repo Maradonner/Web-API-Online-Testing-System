@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 using TestingSystem.Data;
 using TestingSystem.Models;
 using TestingSystem.Services.AuthService;
@@ -16,20 +14,11 @@ public class AdminController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
 
-    public AdminController(AppDbContext context, IMapper mapper, IAuthService authService)
+    public AdminController(AppDbContext context, IAuthService authService)
     {
         _context = context;
-        _mapper = mapper;
         _authService = authService;
-    }
-
-    [HttpPost("register")]
-    public async Task<ActionResult<User>> RegisterUser(UserDto request)
-    {
-        var response = await _authService.RegisterUserAsync(request);
-        return Ok(response);
     }
 
     [HttpGet]
@@ -46,42 +35,13 @@ public class AdminController : ControllerBase
         return Ok(users);
     }
 
-    //[HttpGet]
-    //public async Task<ActionResult> GetUsersSortAsync(string sort, string order, int page)
-    //{
-    //    const int pageSize = 10; // Set the number of items per page
-
-    //    // Apply sorting
-    //    IQueryable<User> query = db.UserInfos;
-    //    switch (sort)
-    //    {
-    //        case "name":
-    //            query = order == "asc" ? query.OrderBy(u => u.Name) : query.OrderByDescending(u => u.Name);
-    //            break;
-    //        case "email":
-    //            query = order == "asc" ? query.OrderBy(u => u.Email) : query.OrderByDescending(u => u.Email);
-    //            break;
-    //        // Add other cases for other sortable properties
-    //        default:
-    //            query = query.OrderBy(u => u.Id);
-    //            break;
-    //    }
-
-    //    // Apply pagination
-    //    query = query.Skip((page - 1) * pageSize).Take(pageSize);
-
-    //    var users = query.ToList();
-
-    //    return Ok(users);
-    //}
-
-
     [HttpPut("update-user")]
     public async Task<ActionResult> UpdateUser(UserDto model)
     {
         var user = await _context.Users.FirstOrDefaultAsync(i => i.Id == model.Id);
 
-        if (user == null) return BadRequest();
+        if (user == null) 
+            return BadRequest();
 
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
@@ -94,7 +54,8 @@ public class AdminController : ControllerBase
     {
         var user = await _context.Users.FirstOrDefaultAsync(q => q.Id == id);
 
-        if (user == null) return NotFound();
+        if (user == null) 
+            return NotFound();
 
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();

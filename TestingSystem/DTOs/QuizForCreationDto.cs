@@ -1,6 +1,5 @@
-﻿namespace TestingSystem.DTOs
+﻿namespace TestingSystem.DTOs;
+
+public class QuizForCreationDto : QuizForManipulationDto
 {
-    public class QuizForCreationDto : QuizForManipulationDto
-    {
-    }
 }

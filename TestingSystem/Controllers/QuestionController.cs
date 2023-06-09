@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TestingSystem.Data;
+using TestingSystem.DTOs;
 using TestingSystem.Models;
+using TestingSystem.Repositories.Interfaces;
 
 namespace TestingSystem.Controllers;
 
@@ -10,82 +12,67 @@ namespace TestingSystem.Controllers;
 [ApiController]
 public class QuestionController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IQuestionRepository _questionRepository;
     private readonly IMapper _mapper;
 
-    public QuestionController(AppDbContext context, IMapper mapper)
+    public QuestionController(IQuestionRepository repository, IMapper mapper)
     {
-        _context = context;
+        _questionRepository = repository;
         _mapper = mapper;
     }
 
-    [HttpGet]
-    [Route("GetQuestion/{id}", Name = "Question")]
+    [HttpGet("GetQuestion/{id}", Name = "Question")]
     public async Task<ActionResult> GetQuestionById(int id)
     {
-        var question = await _context.TriviaQuestions
-            .Include(o => o.Options)
-            .FirstOrDefaultAsync(x => x.Id == id);
-        if (question == null) return NotFound();
+        var question = await _questionRepository.GetQuestionByIdAsync(id);
+
+        if (question == null)
+            return NotFound();
+
         return Ok(question);
     }
 
-    [HttpGet]
-    [Route("GetAllQuestions")]
+    [HttpGet("GetAllQuestions")]
     public async Task<ActionResult> GetAllQuestions()
     {
-        var questions = await _context.TriviaQuestions.Include(o => o.Options).ToListAsync();
-        if (questions == null) return NotFound();
+        var questions = await _questionRepository.GetAllQuestionsAsync();
+
+        if (questions == null)
+            return NotFound();
+
         return Ok(questions);
     }
 
-
-    [HttpPost]
-    [Route("CreateQuestion")]
-    public ActionResult CreateQuiz([FromBody] QuestionDto model)
+    [HttpPost("CreateQuestion")]
+    public async Task<ActionResult> CreateQuiz([FromBody] QuestionForCreationDto model)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
         var quiz = _mapper.Map<TriviaQuestion>(model);
 
-        _context.TriviaQuestions.Add(quiz);
-        _context.SaveChanges();
+        await _questionRepository.CreateQuestionAsync(quiz);
 
-        return CreatedAtRoute("Question", new {id = quiz.Id});
+        return CreatedAtRoute("Question", new { id = quiz.Id }, quiz);
     }
 
-    [HttpPut]
-    [Route("UpdateQuestion")]
-    public async Task<ActionResult> PutQuestion([FromBody] QuestionDto model)
+    [HttpPut("UpdateQuestion")]
+    public async Task<ActionResult> PutQuestion([FromBody] QuestionForUpdateDto model)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-        var question = await _context.TriviaQuestions.Include(o => o.Options)
-            .FirstOrDefaultAsync(i => i.Id == model.Id);
-        if (question == null) return BadRequest();
+        var question = await _questionRepository.GetQuestionByIdAsync(model.Id);
 
+        if (question == null)
+            return BadRequest();
 
         question.Title = model.Title;
         question.Options = _mapper.Map<List<TriviaOption>>(model.Options);
 
-        _context.TriviaQuestions.Update(question);
-        await _context.SaveChangesAsync();
-
+        _questionRepository.UpdateQuestion(question);
 
         return Ok(question);
     }
 
-    [HttpDelete]
-    [Route("DeleteQuestion/{id}")]
+    [HttpDelete("DeleteQuestion/{id}")]
     public async Task<ActionResult> DeleteQuestion(int id)
     {
-        var quiz = await _context.TriviaQuestions.FirstOrDefaultAsync(q => q.Id == id);
-
-        if (quiz == null) return NotFound();
-
-        _context.TriviaQuestions.Remove(quiz);
-        await _context.SaveChangesAsync();
+        await _questionRepository.DeleteQuestionAsync(id);
 
         return NoContent();
     }

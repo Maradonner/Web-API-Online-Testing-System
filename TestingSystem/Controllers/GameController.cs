@@ -46,12 +46,12 @@ public class GameController : ControllerBase
                 return BadRequest();
         }
 
-        if (temp == null) 
+        if (temp == null)
             return BadRequest();
 
-        if (temp is not AnswerResponse tempo) 
+        if (temp is not AnswerResponse tempo)
             return BadRequest(temp);
-        
+
         return Ok(tempo);
     }
 }

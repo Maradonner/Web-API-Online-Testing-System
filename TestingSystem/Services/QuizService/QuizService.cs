@@ -26,7 +26,7 @@ public class QuizService : IQuizService
     {
         return await _context.TriviaQuizzes
             .Include(o => o.Questions)
-                .ThenInclude(o => o.Options)
+            .ThenInclude(o => o.Options)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
@@ -42,7 +42,7 @@ public class QuizService : IQuizService
     {
         var model = await _context.TriviaQuizzes
             .Include(o => o.Questions)
-                .ThenInclude(o => o.Options)
+            .ThenInclude(o => o.Options)
             .ToListAsync();
 
         return model;
@@ -78,7 +78,7 @@ public class QuizService : IQuizService
     {
         var quiz = await _context.TriviaQuizzes
             .Include(q => q.Questions)
-                .ThenInclude(o => o.Options)
+            .ThenInclude(o => o.Options)
             .FirstOrDefaultAsync(i => i.Id == model.Id);
 
         if (quiz != null)

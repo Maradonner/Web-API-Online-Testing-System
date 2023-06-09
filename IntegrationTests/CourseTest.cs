@@ -16,7 +16,7 @@ public class CourseTest : BaseTest
     public void GeneratorCodeTest()
     {
         const int length = 6;
-        var code = CourseCodeGenerator.GenerateUniqueCode(_dbHelper.Context, length);
+        var code = CourseCodeGenerator.GenerateUniqueCode(_dbHelper.Context);
         Assert.That(code.Length, Is.EqualTo(length));
     }
 

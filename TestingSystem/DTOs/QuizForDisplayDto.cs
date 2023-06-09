@@ -1,10 +1,7 @@
-﻿using TestingSystem.Models;
+﻿namespace TestingSystem.DTOs;
 
-namespace TestingSystem.DTOs
+public class QuizForDisplayDto : QuizForManipulationDto
 {
-    public class QuizForDisplayDto : QuizForManipulationDto
-    {
-        public bool IsCompleted { get; set; }
-        public int Score { get; set; }
-    }
+    public bool IsCompleted { get; set; }
+    public int Score { get; set; }
 }

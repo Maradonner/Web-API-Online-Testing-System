@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using TestingSystem.Exceptions;
 using TestingSystem.Models;
 using TestingSystem.Services.AuthService;
 
@@ -10,29 +10,34 @@ namespace TestingSystem.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly HttpClient _httpClient;
 
     public AuthController(IAuthService authService)
     {
         _authService = authService;
-        _httpClient = new HttpClient();
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<User>> RegisterUser(UserDto request)
+    public async Task<ActionResult<User>> RegisterUser(UserDto request, CancellationToken ct)
     {
-        if (await _authService.GetUserAsync(request.Username) != null)
+        using var transaction = _authService.BeginTransaction();
+        try
         {
-            return BadRequest("Email is already exists");
+            var response = await _authService.RegisterUserAsync(request, ct);
+            transaction.Commit();
+            return Ok(response);
         }
-        var response = await _authService.RegisterUserAsync(request);
-        return Ok(response);
+        catch (UsernameAlreadyExistsException)
+        {
+            transaction.Rollback();
+            return Conflict("Username is already taken");
+        }
+
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<User>> Login(UserDto request)
+    public async Task<ActionResult<User>> Login(UserDto request, CancellationToken ct)
     {
-        var response = await _authService.LoginAsync(request);
+        var response = await _authService.LoginAsync(request, ct);
         if (response.Success)
             return Ok(response);
 
@@ -40,19 +45,12 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    public async Task<ActionResult<string>> RefreshToken(RefreshDto request)
+    public async Task<ActionResult<string>> RefreshToken(RefreshDto request, CancellationToken ct)
     {
-        var response = await _authService.RefreshTokenAsync(request.RefreshToken);
+        var response = await _authService.RefreshTokenAsync(request.RefreshToken, ct);
         if (response.Success)
             return Ok(response);
 
         return BadRequest(response.Message);
-    }
-
-    [HttpGet]
-    [Authorize]
-    public ActionResult<string> Aloha()
-    {
-        return Ok("You are authorized!");
     }
 }

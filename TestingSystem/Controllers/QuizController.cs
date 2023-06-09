@@ -14,10 +14,10 @@ namespace TestingSystem.Controllers;
 [ApiController]
 public class QuizController : ControllerBase
 {
+    private readonly IMapper _mapper;
     private readonly int _pageSize = 10;
     private readonly IHubContext<QuizHub> _quizHub;
     private readonly IQuizService _quizService;
-    private readonly IMapper _mapper;
 
     public QuizController(IQuizService quizService, IHubContext<QuizHub> quizHub, IMapper mapper)
     {
@@ -39,7 +39,7 @@ public class QuizController : ControllerBase
     {
         var question = await _quizService.GetQuizByIdAsync(id);
 
-        if (question == null) 
+        if (question == null)
             return NotFound();
         return Ok(question);
     }
@@ -51,7 +51,7 @@ public class QuizController : ControllerBase
         var quiz = await _quizService.CreateQuizAsync(model, userId);
         await _quizHub.Clients.All.SendAsync("QuizCreated", model.Id, model.Title, userId);
 
-        return CreatedAtRoute("GetQuiz", new {id = quiz.Id}, quiz );
+        return CreatedAtRoute("GetQuiz", new { id = quiz.Id }, quiz);
     }
 
     [HttpGet("Page/{pageNumber}")]
@@ -59,7 +59,7 @@ public class QuizController : ControllerBase
     {
         var totalPages = await _quizService.GetTotalPagesAsync(_pageSize);
 
-        if (pageNumber < 1 || pageNumber > totalPages) 
+        if (pageNumber < 1 || pageNumber > totalPages)
             return BadRequest("Page is not found");
 
         var questions = await _quizService.GetQuizPageAsync(pageNumber, _pageSize);
@@ -74,14 +74,13 @@ public class QuizController : ControllerBase
 
         var quizzes = await _quizService.GetAllQuizAsync();
 
-
         var quizList = new List<object>();
 
         foreach (var quiz in quizzes)
         {
-            (bool isCompleted, int score) = await _quizService.CheckUserCompletionStatusAsync(currentUserId, quiz.Id);
+            (var isCompleted, var score) = await _quizService.CheckUserCompletionStatusAsync(currentUserId, quiz.Id);
 
-            quizList.Add(new 
+            quizList.Add(new
             {
                 quiz.Id,
                 quiz.Title,
@@ -119,7 +118,7 @@ public class QuizController : ControllerBase
 
         if (quiz == null)
             return NotFound("Quiz is not found");
-        else if (quiz.UserId != GetUserId())
+        if (quiz.UserId != GetUserId())
             return BadRequest("Action prohibited");
 
         var isSucceed = await _quizService.DeleteQuizAsync(quiz);

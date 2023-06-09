@@ -14,13 +14,3 @@ public class TriviaOptionValidator : AbstractValidator<TriviaOption>
     }
 }
 
-public class TriviaOptionDTOValidator : AbstractValidator<OptionDto>
-{
-    public TriviaOptionDTOValidator()
-    {
-        RuleFor(x => x.Title)
-            .NotEmpty().WithMessage("Option title is required.")
-            .MinimumLength(3).WithMessage("Option title cannot be less than 3 characters.")
-            .MaximumLength(255).WithMessage("Option title cannot exceed 255 characters.");
-    }
-}
